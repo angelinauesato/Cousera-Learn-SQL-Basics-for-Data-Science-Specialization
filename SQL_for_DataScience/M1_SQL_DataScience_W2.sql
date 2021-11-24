@@ -3,8 +3,12 @@ Learn SQL Basics for Data Science Specialization
 SQL for Data Science
 Week 2
 For all of the questions in this quiz, we are using the Chinook database. All of the interactive code blocks have been setup to retrieve data only from this database.
+
 database: https://github.com/lerocha/chinook-database/tree/master/ChinookDatabase/DataSources
+
 ER: https://ucde-rey.s3.amazonaws.com/DSV1015/ChinookDatabaseSchema.png
+
+Database: sqlite3
 
 Coding Questions - 9 questions
 */

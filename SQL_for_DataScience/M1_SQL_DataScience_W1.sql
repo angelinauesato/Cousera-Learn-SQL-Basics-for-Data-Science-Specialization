@@ -7,6 +7,7 @@ For all of the questions in this quiz, we are using the Chinook database. All of
 database: https://github.com/lerocha/chinook-database/tree/master/ChinookDatabase/DataSources
 
 Coding Questions - 3 questions
+Database: sqlite3
 
 */
 
