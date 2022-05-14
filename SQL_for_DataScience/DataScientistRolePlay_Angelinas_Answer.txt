@@ -295,18 +295,92 @@ Result: 232
 
 Part 2: Inferences and Analysis
 
-1. Pick one city and category of your choice and group the businesses in that city or category by their overall star rating. Compare the businesses with 2-3 stars to the businesses with 4-5 stars and answer the following questions. Include your code.
+1. Pick one city and category of your choice and group the businesses in that city or category by their overall star rating. 
+Compare the businesses with 2-3 stars to the businesses with 4-5 stars and answer the following questions. Include your code.
+
+I am choosing: City: Toronto and Category: Restaurants.
+
+# SQL To pick the city and category with more choices:
+Select b.city, category, COUNT(b.id) total
+FROM Business b
+INNER JOIN category c ON b.id = c.business_id
+GROUP BY b.city, c.category
+HAVING COUNT(b.id) > 4;
+
+Result:
++---------+-------------+-------+
+| city    | category    | total |
++---------+-------------+-------+
+| Phoenix | Restaurants |     6 |
+| Toronto | Restaurants |    10 |
++---------+-------------+-------+
+
 	
 i. Do the two groups you chose to analyze have a different distribution of hours?
-
+Yes. The 2-3 starts opens 7days/week and start their shift earlier than the 4-5 stars. The 5 stars beside opening late, they open 5 days/week.
 
 ii. Do the two groups you chose to analyze have a different number of reviews?
+Yes. The group with 4-5 stars (89 reviews) have almost double of reviews compared with the 2-3 stars restaurants with most reviews (47 reviews) and 1000% more reviews with the restaurants with less reviews (5).
          
          
 iii. Are you able to infer anything from the location data provided between these two groups? Explain.
+No. They are in different neighbourhood and different and forward sortation area (FSA), FSA - the 3 first letters of postal code.
+
 
 SQL code used for analysis:
 
+SELECT b.city, category, h.hours, b.review_count,
+CASE 
+WHEN stars BETWEEN 2 and 3 THEN '2-3 stars'
+WHEN stars BETWEEN 4 and 5 THEN '4-5 stars'
+END AS stars_group,
+CASE 
+WHEN UPPER(hours) LIKE '%MONDAY%' THEN 'Monday'
+WHEN UPPER(hours) LIKE '%TUESDAY%' THEN 'Tuesday'
+WHEN UPPER(hours) LIKE '%WEDNESDAY%' THEN 'Wednesday'
+WHEN UPPER(hours) LIKE '%THURSDAY%' THEN 'Thursday'
+WHEN UPPER(hours) LIKE '%FRIDAY%' THEN 'Friday'
+WHEN UPPER(hours) LIKE '%SATURDAY%' THEN 'Saturday'
+WHEN UPPER(hours) LIKE '%SUNDAY%' THEN 'Sunday'
+END AS week_day, b.neighborhood,
+b.address, b.postal_code
+FROM Business b
+INNER JOIN category c ON b.id = c.business_id
+INNER JOIN hours h ON b.id = h.business_id
+WHERE b.city = 'Toronto' and c.category = 'Restaurants' AND b.stars IN (2,3,4,5)
+GROUP BY b.id, h.hours
+ORDER BY stars_group, week_day;
+
++---------+-------------+-----------------------+--------------+-------------+-----------+------------------------+-----------------------+-------------+
+| city    | category    | hours                 | review_count | stars_group | week_day  | neighborhood           | address               | postal_code |
++---------+-------------+-----------------------+--------------+-------------+-----------+------------------------+-----------------------+-------------+
+| Toronto | Restaurants | Friday|10:30-21:00    |           47 | 2-3 stars   | Friday    | Downtown Core          | 260 Yonge Street      | M4B 2L9     |
+| Toronto | Restaurants | Friday|9:00-4:00      |           34 | 2-3 stars   | Friday    | Entertainment District | 270 Adelaide Street W | M5H 1X6     |
+| Toronto | Restaurants | Friday|11:00-23:00    |            5 | 2-3 stars   | Friday    | Downtown Core          | 389 Church Street     | M5B 2E5     |
+| Toronto | Restaurants | Monday|10:30-21:00    |           47 | 2-3 stars   | Monday    | Downtown Core          | 260 Yonge Street      | M4B 2L9     |
+| Toronto | Restaurants | Monday|9:00-23:00     |           34 | 2-3 stars   | Monday    | Entertainment District | 270 Adelaide Street W | M5H 1X6     |
+| Toronto | Restaurants | Monday|11:00-23:00    |            5 | 2-3 stars   | Monday    | Downtown Core          | 389 Church Street     | M5B 2E5     |
+| Toronto | Restaurants | Saturday|10:30-21:00  |           47 | 2-3 stars   | Saturday  | Downtown Core          | 260 Yonge Street      | M4B 2L9     |
+| Toronto | Restaurants | Saturday|10:00-4:00   |           34 | 2-3 stars   | Saturday  | Entertainment District | 270 Adelaide Street W | M5H 1X6     |
+| Toronto | Restaurants | Saturday|11:00-23:00  |            5 | 2-3 stars   | Saturday  | Downtown Core          | 389 Church Street     | M5B 2E5     |
+| Toronto | Restaurants | Sunday|11:00-19:00    |           47 | 2-3 stars   | Sunday    | Downtown Core          | 260 Yonge Street      | M4B 2L9     |
+| Toronto | Restaurants | Sunday|10:00-23:00    |           34 | 2-3 stars   | Sunday    | Entertainment District | 270 Adelaide Street W | M5H 1X6     |
+| Toronto | Restaurants | Sunday|11:00-23:00    |            5 | 2-3 stars   | Sunday    | Downtown Core          | 389 Church Street     | M5B 2E5     |
+| Toronto | Restaurants | Thursday|10:30-21:00  |           47 | 2-3 stars   | Thursday  | Downtown Core          | 260 Yonge Street      | M4B 2L9     |
+| Toronto | Restaurants | Thursday|9:00-23:00   |           34 | 2-3 stars   | Thursday  | Entertainment District | 270 Adelaide Street W | M5H 1X6     |
+| Toronto | Restaurants | Thursday|11:00-23:00  |            5 | 2-3 stars   | Thursday  | Downtown Core          | 389 Church Street     | M5B 2E5     |
+| Toronto | Restaurants | Tuesday|10:30-21:00   |           47 | 2-3 stars   | Tuesday   | Downtown Core          | 260 Yonge Street      | M4B 2L9     |
+| Toronto | Restaurants | Tuesday|9:00-23:00    |           34 | 2-3 stars   | Tuesday   | Entertainment District | 270 Adelaide Street W | M5H 1X6     |
+| Toronto | Restaurants | Tuesday|11:00-23:00   |            5 | 2-3 stars   | Tuesday   | Downtown Core          | 389 Church Street     | M5B 2E5     |
+| Toronto | Restaurants | Wednesday|10:30-21:00 |           47 | 2-3 stars   | Wednesday | Downtown Core          | 260 Yonge Street      | M4B 2L9     |
+| Toronto | Restaurants | Wednesday|9:00-23:00  |           34 | 2-3 stars   | Wednesday | Entertainment District | 270 Adelaide Street W | M5H 1X6     |
+| Toronto | Restaurants | Wednesday|11:00-23:00 |            5 | 2-3 stars   | Wednesday | Downtown Core          | 389 Church Street     | M5B 2E5     |
+| Toronto | Restaurants | Friday|18:00-23:00    |           89 | 4-5 stars   | Friday    | Niagara                | 169 Niagara Street    | M5V         |
+| Toronto | Restaurants | Saturday|18:00-23:00  |           89 | 4-5 stars   | Saturday  | Niagara                | 169 Niagara Street    | M5V         |
+| Toronto | Restaurants | Sunday|12:00-16:00    |           89 | 4-5 stars   | Sunday    | Niagara                | 169 Niagara Street    | M5V         |
+| Toronto | Restaurants | Thursday|18:00-23:00  |           89 | 4-5 stars   | Thursday  | Niagara                | 169 Niagara Street    | M5V         |
++---------+-------------+-----------------------+--------------+-------------+-----------+------------------------+-----------------------+-------------+
+(Output limit exceeded, 25 of 26 total rows shown)
 		
 		
 2. Group business based on the ones that are open and the ones that are closed. What differences can you find between the ones that are still open and the ones that are closed? List at least two differences and the SQL code you used to arrive at your answer.
