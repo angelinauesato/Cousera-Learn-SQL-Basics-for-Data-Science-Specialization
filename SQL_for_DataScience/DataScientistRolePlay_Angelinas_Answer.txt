@@ -386,15 +386,30 @@ ORDER BY stars_group, week_day;
 2. Group business based on the ones that are open and the ones that are closed. What differences can you find between the ones that are still open and the ones that are closed? List at least two differences and the SQL code you used to arrive at your answer.
 		
 i. Difference 1:
-         
+The opened business have average stars and average funny bigger than the closed ones.         
          
 ii. Difference 2:
-         
-         
+Closed business have average useful and cool greater than opened ones.        
          
 SQL code used for analysis:
 
-	
+SELECT 
+CASE WHEN b.is_open = 0 THEN 'Closed'
+ELSE 'Open'
+END AS 'Is Open?', count(b.is_open) AS 'Qty',
+SUM(review_count) AS 'Qty Reviews',
+AVG(review_count) AS 'AVG_Reviews',
+AVG(r.stars) AS 'AVG_stars', AVG(r.useful), AVG(r.funny), AVG(r.cool)
+FROM business b
+INNER JOIN review r ON b.id = r.business_id
+GROUP BY b.is_open;
+
++----------+-----+-------------+---------------+---------------+----------------+----------------+----------------+
+| Is Open? | Qty | Qty Reviews |   AVG_Reviews |     AVG_stars |  AVG(r.useful) |   AVG(r.funny) |    AVG(r.cool) |
++----------+-----+-------------+---------------+---------------+----------------+----------------+----------------+
+| Closed   |  71 |        9217 | 129.816901408 | 3.64788732394 | 0.971830985915 | 0.211267605634 | 0.422535211268 |
+| Open     | 565 |      175821 | 311.187610619 |  3.7610619469 | 0.856637168142 | 0.269026548673 | 0.387610619469 |
++----------+-----+-------------+---------------+---------------+----------------+----------------+----------------+
 	
 3. For this last part of your analysis, you are going to choose the type of analysis you want to conduct on the Yelp dataset and are going to prepare the data for analysis.
 
