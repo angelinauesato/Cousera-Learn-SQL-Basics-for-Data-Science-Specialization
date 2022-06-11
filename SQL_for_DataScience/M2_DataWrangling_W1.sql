@@ -305,3 +305,50 @@ GROUP BY
   user_id,
   platform
 ORDER BY event_id
+
+
+-- Exercise 2:
+-- Using any methods you like, determine if you can you trust this events table. (HINT: When did
+-- we start recording events on mobile)
+
+ SELECT DATE(event_time) date,
+ platform,
+ COUNT(*) AS rows
+ FROM dsv1069.events_ex2
+ GROUP BY  event_time,platform
+
+-- Exercise 3: Imagine that you need to count item views by day. You found this table
+-- item_views_by_category_temp - should you use it to answer your questiuon?
+SELECT *
+FROM dsv1069.item_views_by_category_temp
+
+-- Answer: No. There is no a column with date to do the count
+-- Mobile was not being recorded all the times
+
+
+-- Exercise 4: Using any methods you like, decide if this table is ready to be used as a source of
+  -- truth.
+
+  SELECT *
+  FROM dsv1069.raw_events
+  LIMIT 100
+
+  -- Answer: No the table is not in the schema or folder dsv1069
+
+-- Exercise 5: Is this the right way to join orders to users?
+-- Is this the right way this join.
+
+-- SELECT COUNT(*)
+-- FROM dsv1069.orders o
+-- JOIN dsv1069.users u
+-- ON o.user_id = u.parent_user_id -- 2604
+
+--WHERE parent_user_id IS NULL --110770 with parent_user_id
+-- orders: 47402
+-- users: 117178
+
+-- Answer: The right way it will be the join condition: o.user_id = u.id
+SELECT COUNT(*)
+FROM dsv1069.orders o
+JOIN dsv1069.users u
+ON o.user_id = u.id -- 47402 orders join with users, there is no order with no user.
