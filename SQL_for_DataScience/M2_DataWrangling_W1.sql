@@ -5,23 +5,23 @@ addresses, but only for non-deleted users.
 */
 
 -- Query returning all the email address of non-deleted users
-SELECT email_address FROM dsv1069.users WHERE deleted_at is NULL
+select email_address from dsv1069.users where deleted_at is null
 
 -- Quantity of users
-SELECT COUNT(*) FROM dsv1069.users;
+select count(*) from dsv1069.users;
 -- 117178
 
 -- Quantity of non-deleted users
-SELECT COUNT(*)
-FROM dsv1069.users WHERE deleted_at is NULL;
+select count(*)
+from dsv1069.users where deleted_at is null;
 -- 114290
 
 /*
 Exercise 2:
 --Goal: Use the items table to count the number of items for sale in each category
 */
- SELECT i.category, COUNT(i.id) FROM dsv1069.items i
- GROUP BY i.category;
+ select i.category, count(i.id) from dsv1069.items i
+ group by i.category;
 -- Results:
 -- category  - count
 -- dongle -	211
@@ -39,8 +39,8 @@ Exercise 3:
 --Goal: Select all of the columns from the result when you JOIN the users table to the orders table
 */
 
-SELECT * FROM dsv1069.orders o
-INNER JOIN dsv1069.users u ON o.user_id = u.id;
+select * from dsv1069.orders o
+inner join dsv1069.users u on o.user_id = u.id;
 
 -- Results:
 invoice_id	line_item_id	user_id	item_id	item_name	item_category	price	created_at_duplicate_column_name_1	paid_at	created_at	deleted_at	email_address	first_name	id	last_name	merged_at	parent_user_id
@@ -151,22 +151,22 @@ invoice_id	line_item_id	user_id	item_id	item_name	item_category	price	created_at
 */
 
 -- with error:
-SELECT
-COUNT(event_id) AS events
-FROM dsv1069.events
-WHERE event_name = ‘view_item’;
+select
+count(event_id) as events
+from dsv1069.events
+where event_name = ‘view_item’;
 
 -- Correct one
 
-SELECT  COUNT( DISTINCT event_id) AS events
-FROM dsv1069.events
-WHERE event_name = 'view_item';
+select  count( distinct event_id) as events
+from dsv1069.events
+where event_name = 'view_item';
 -- Results: 525572
 
 -- This is why the query is wrong
-SELECT event_id, COUNT(event_id)
-FROM dsv1069.events
-GROUP BY event_id;
+select event_id, count(event_id)
+from dsv1069.events
+group by event_id;
 
 /*
 -- Exercise 5:
@@ -175,22 +175,22 @@ GROUP BY event_id;
 */
 
 -- Starter Code:
-SELECT
-COUNT(item_id) as item_count
-FROM dsv1069.orders
-INNER JOIN dsv1069.items ON orders.item_id = items.id
+select
+count(item_id) as item_count
+from dsv1069.orders
+inner join dsv1069.items on orders.item_id = items.id
 
 -- Why it's wrong
 -- SELECT COUNT(*) FROM dsv1069.items; -- 2198
-SELECT
-COUNT(DISTINCT o.item_id) as item_count
-FROM dsv1069.items i
-INNER JOIN dsv1069.orders o ON i.id = o.item_id --2198
+select
+count(distinct o.item_id) as item_count
+from dsv1069.items i
+inner join dsv1069.orders o on i.id = o.item_id --2198
 
 -- OR
-SELECT
-COUNT(DISTINCT o.item_id) as item_count
-FROM dsv1069.orders o;
+select
+count(distinct o.item_id) as item_count
+from dsv1069.orders o;
 
 /*
 -- Exercise 6:
@@ -200,17 +200,17 @@ FROM dsv1069.orders o;
 
 -- Starter Code:
 
-SELECT users.id as user_id, MIN(orders.paid_at) AS min_paid_at
-FROM dsv1069.orders
-INNER JOIN dsv1069.users ON orders.user_id = users.id
-GROUP BY users.id
+select users.id as user_id, min(orders.paid_at) as min_paid_at
+from dsv1069.orders
+inner join dsv1069.users on orders.user_id = users.id
+group by users.id
 
 
 -- Answer: This way will bring users tha didn't have an order
-SELECT u.id AS user_id, MIN(o.paid_at) AS min_paid_at
-FROM dsv1069.users u
-LEFT OUTER JOIN dsv1069.orders o ON o.user_id = u.id
-GROUP BY u.id;
+select u.id as user_id, min(o.paid_at) as min_paid_at
+from dsv1069.users u
+left outer join dsv1069.orders o on o.user_id = u.id
+group by u.id;
 
 /*
 -- Exercise 7:
@@ -219,36 +219,36 @@ GROUP BY u.id;
 */
 
 -- Starter Code:
-SELECT
-(CASE WHEN first_view IS NULL THEN false
-    ELSE true END) AS has_viewed_profile_page,
-COUNT(user_id) AS users
-FROM
-    (SELECT u.id) AS user_id,
-    MIN(e.event_time) AS first_view
-    FROM dsv1069.users u
-    LEFT OUTER JOIN
-        dsv1069.events e ON e.user_id = u.id
-        WHERE e.event_name = 'view_user_profile'
-        GROUP BY u.id ) first_profile_views
-        GROUP BY (CASE WHEN first_view IS NULL THEN false
-        ELSE true END)
+select
+(case when first_view is null then false
+    else true end) as has_viewed_profile_page,
+count(user_id) as users
+from
+    (select u.id) as user_id,
+    min(e.event_time) as first_view
+    from dsv1069.users u
+    left outer join
+        dsv1069.events e on e.user_id = u.id
+        where e.event_name = 'view_user_profile'
+        group by u.id ) first_profile_views
+        group by (case when first_view is null then false
+        else true end)
 
 -- Correct one
 -- When We have the where with events, my query is behaving as a right join.
-SELECT
-(CASE WHEN first_view IS NULL THEN false
-    ELSE true END) AS has_viewed_profile_page,
-COUNT(user_id) AS users
-FROM
-    (SELECT u.id AS user_id,
-    MIN(e.event_time) AS first_view
-    FROM dsv1069.users u
-    LEFT OUTER JOIN
-        dsv1069.events e ON e.user_id = u.id AND e.event_name = 'view_user_profile'
-        GROUP BY u.id ) first_profile_views
-        GROUP BY (CASE WHEN first_view IS NULL THEN false
-        ELSE true END)
+select
+(case when first_view is null then false
+    else true end) as has_viewed_profile_page,
+count(user_id) as users
+from
+    (select u.id as user_id,
+    min(e.event_time) as first_view
+    from dsv1069.users u
+    left outer join
+        dsv1069.events e on e.user_id = u.id and e.event_name = 'view_user_profile'
+        group by u.id ) first_profile_views
+        group by (case when first_view is null then false
+        else true end)
 
 
 
@@ -256,11 +256,11 @@ FROM
  Event table
  */
 
- SELECT event_id,
+ select event_id,
  event_time,
  user_id,
  platform,
- (CASE WHEN parameter_name == 'viewed_user_id'
+ (case when parameter_name == 'viewed_user_id'
   THEN CAST(parameter_value AS INT)
   ELSE NULL
   END) AS viewed_user_id
@@ -269,49 +269,49 @@ FROM
     event_name = 'view_user_profile';
 
 -- JSON
- SELECT event_id,
+ select event_id,
  event_time,
  user_id,
  platform,
- get_json(raw.viewed_user_id) AS viewed_user_id
- FROM dsv1069.events
- WHERE
+ get_json(raw.viewed_user_id) as viewed_user_id
+ from dsv1069.events
+ where
     event_name = 'view_user';
 
 -- Data Formats
 -- Exercise 1:
 -- Goal: Write a query to format the view_item event into a table with the appropriate columns
-SELECT
+select
   event_id,
   event_time,
   user_id,
   platform,
   --CAST(parameter_value AS INT ) AS viewed_user_id
-  MAX(CASE WHEN parameter_name = 'item_id'
-    THEN CAST(parameter_value AS INT )
-    ELSE NULL
-    END) AS item_id,
-    MAX(CASE WHEN parameter_name = 'referrer'
-    THEN parameter_value
-    ELSE NULL
-    END) AS referrer
-FROM
+  max(case when parameter_name = 'item_id'
+    then cast(parameter_value as int )
+    else null
+    end) as item_id,
+    max(case when parameter_name = 'referrer'
+    then parameter_value
+    else null
+    end) as referrer
+from
   dsv1069.events
-WHERE
+where
   event_name = 'view_item'
-GROUP BY
+group by
   event_id,
   event_time,
   user_id,
   platform
-ORDER BY event_id
+order by event_id
 
 
 -- Exercise 2:
 -- Using any methods you like, determine if you can you trust this events table. (HINT: When did
 -- we start recording events on mobile)
 
- SELECT DATE(event_time) date,
+ select date(event_time) date,
  platform,
  COUNT(*) AS rows
  FROM dsv1069.events_ex2
@@ -319,8 +319,8 @@ ORDER BY event_id
 
 -- Exercise 3: Imagine that you need to count item views by day. You found this table
 -- item_views_by_category_temp - should you use it to answer your questiuon?
-SELECT *
-FROM dsv1069.item_views_by_category_temp
+select *
+from dsv1069.item_views_by_category_temp
 
 -- Answer: No. There is no a column with date to do the count
 -- Mobile was not being recorded all the times
@@ -329,11 +329,25 @@ FROM dsv1069.item_views_by_category_temp
 -- Exercise 4: Using any methods you like, decide if this table is ready to be used as a source of
   -- truth.
 
-  SELECT *
-  FROM dsv1069.raw_events
-  LIMIT 100
+  select *
+  from dsv1069.raw_events
+  limit 100
 
   -- Answer: No the table is not in the schema or folder dsv1069
+
+  -- Considering events table, there is events for each day and platform:
+
+select
+  date(event_time),
+  platform,
+  COUNT(user_id) AS users
+FROM dsv1069.events
+
+GROUP BY DATE(event_time),
+platform
+
+ORDER BY users
+
 
 -- Exercise 5: Is this the right way to join orders to users?
 -- Is this the right way this join.
@@ -348,7 +362,163 @@ FROM dsv1069.item_views_by_category_temp
 -- users: 117178
 
 -- Answer: The right way it will be the join condition: o.user_id = u.id
-SELECT COUNT(*)
-FROM dsv1069.orders o
-JOIN dsv1069.users u
-ON o.user_id = u.id -- 47402 orders join with users, there is no order with no user.
+select count(*)
+from dsv1069.orders o
+join dsv1069.users u
+on o.user_id = u.id -- 47402 orders join with users, there is no order with no user.
+
+-- COALESCE function validate the null value and if first argument is null then replace with the second and so on.
+
+-- Counting_Users_Ex1
+-- Exercise 1: We’ll be using the users table to answer the question “How many new users are
+-- added each day?“. Start by making sure you understand the columns in the table.
+
+select
+  date(u.created_at) AS DAY,
+  COUNT(u.id) AS Total_Users
+FROM dsv1069.users u
+GROUP BY DATE(u.created_at)
+ORDER BY DATE(u.created_at)
+
+-- Here shows the users data merged and how I'll need to take in consideration when counting new users and deleted users.
+
+ select
+ u.id, u.parent_user_id,u.merged_at
+ from dsv1069.users u
+ order by u.parent_user_id
+
+-- Counting_Users_Ex2
+-- Without worrying about deleted user or merged users, count the number of users
+-- added each day.
+
+select
+  date(u.created_at) AS DAY,
+  COUNT(u.id) AS Total_Users
+FROM dsv1069.users u
+GROUP BY DATE(u.created_at)
+ORDER BY DATE(u.created_at)
+
+-- Counting_Users_Ex3
+-- Consider the following query. Is this the right way to count merged or deleted
+-- users? If all of our users were deleted tomorrow what would the result look like?
+select
+    date(u.created_at) AS DAY,
+    COUNT(u.id) AS Total_Users
+FROM dsv1069.users u
+WHERE
+    u.deleted_at IS NULL -- user was not deleted
+AND
+    (u.id <> u.parent_user_id OR u.parent_user_id IS NULL) -- where the user was merged and not merged, user unique
+GROUP BY
+    DATE(u.created_at)
+ORDER BY
+    DATE(u.created_at)
+
+
+-- Counting_Users_Ex4
+-- Count the number of users deleted each day. Then count the number of users
+-- removed due to merging in a similar way.
+select
+    date(u.deleted_at) AS DAY,
+    COUNT(u.id) AS Deleted_Users
+FROM dsv1069.users u
+WHERE
+    u.deleted_at IS NOT NULL -- user was deleted
+GROUP BY
+    DATE(u.deleted_at)
+ORDER BY
+    DATE(u.deleted_at)
+
+-- Counting_Users_Ex5
+-- Use the pieces you’ve built as sub-tables and create a table that has a column for the date, the number of users created,
+-- the number of users deleted and the number of users merged that day.
+
+-- Counting_Users_Ex5
+
+select
+  new.DAY,
+  new.Users_Added,
+  deleted.Deleted_Users,
+  merged.Merged_Users,
+  (new.Users_Added - deleted.Deleted_Users - merged.Merged_Users) as net_added_users
+  from
+  (select
+    date(created_at) AS DAY,
+    COUNT(id) AS Users_Added
+  FROM dsv1069.users
+  GROUP BY
+    DATE(created_at)
+  ) new
+  LEFT JOIN (
+    select
+      date(deleted_at) AS DAY,
+      COUNT(id) AS Deleted_Users
+    FROM dsv1069.users
+    WHERE
+      deleted_at IS NOT NULL -- user was deleted
+    GROUP BY
+      DATE(deleted_at)
+    ) deleted
+  ON deleted.day = new.day
+  LEFT OUTER JOIN (
+    select
+      date(merged_at) AS day,
+      COUNT(id) AS Merged_Users
+    FROM
+      dsv1069.users
+    WHERE
+      id <> parent_user_id AND
+      parent_user_id IS NOT NULL
+    GROUP BY
+      DATE(merged_at)
+  ) merged
+  ON merged.day = new.day
+
+  ORDER BY new.users_added DESC
+
+
+
+
+-- Counting_Users_Ex6
+-- Exercise 6: Refine your query from #5 to have informative column names and so that null
+--columns return 0.
+select
+  new.DAY,
+  new.Users_Added,
+  COALESCE(deleted.Deleted_Users,0) as Deleted_Users,
+  COALESCE(merged.Merged_Users,0) as Merged_Users,
+  (new.Users_Added - COALESCE(deleted.Deleted_Users,0) - COALESCE(merged.Merged_Users,0)) as net_added_users
+  from
+  (select
+    date(created_at) AS DAY,
+    COUNT(id) AS Users_Added
+  FROM dsv1069.users
+  GROUP BY
+    DATE(created_at)
+  ) new
+  LEFT JOIN (
+    select
+      date(deleted_at) AS DAY,
+      COUNT(id) AS Deleted_Users
+    FROM dsv1069.users
+    WHERE
+      deleted_at IS NOT NULL -- user was deleted
+    GROUP BY
+      DATE(deleted_at)
+    ) deleted
+  ON deleted.day = new.day
+  LEFT OUTER JOIN (
+    select
+      date(merged_at) AS day,
+      COUNT(id) AS Merged_Users
+    FROM
+      dsv1069.users
+    WHERE
+      id <> parent_user_id AND
+      parent_user_id IS NOT NULL
+    GROUP BY
+      DATE(merged_at)
+  ) merged
+  ON merged.day = new.day
+
+  ORDER BY new.users_added DESC
